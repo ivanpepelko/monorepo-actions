@@ -36,6 +36,7 @@ jobs:
           echo "roots=$roots" >> "$GITHUB_OUTPUT"
 
   build:
+    if: ${{ fromJson(needs.build-roots-matrix.outputs.roots)[0] != null }}
     runs-on: ubuntu-latest
     needs: build-roots-matrix
     strategy:
