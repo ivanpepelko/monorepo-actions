@@ -14,18 +14,19 @@ jobs:
     outputs:
       roots: ${{ steps.roots.outputs.roots }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - id: roots
         run: |
+          last_run_sha=$(gh run list -L1 --status success --branch=${{ github.ref_name }} --workflow="${{ github.workflow }}" --json=headSha --jq='.[0].headSha')
           roots='[]'
 
           while IFS= read -r -d '' root
           do
             test -f "$root/.buildignore" && continue
-            git diff --quiet HEAD^ HEAD "$root" && continue
+            git diff --quiet "$last_run_sha" HEAD "$root" && continue
           
             roots=$(jq -c ". + [\"$root\"]" <<< "$roots")
           done < <(find . -maxdepth 1 -mindepth 1 -type d -not -path './.*' -print0)
