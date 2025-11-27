@@ -19,6 +19,8 @@ jobs:
           fetch-depth: 0
 
       - id: roots
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           last_run_sha=$(gh run list -L1 --status success --branch=${{ github.ref_name }} --workflow="${{ github.workflow }}" --json=headSha --jq='.[0].headSha')
           roots='[]'
