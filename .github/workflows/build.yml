@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  resolve_roots:
+    runs-on: ubuntu-latest
+    outputs:
+      roots: ${{ steps.roots.outputs.roots }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - id: roots
+        run: |
+          roots='[]'
+
+          while IFS= read -r -d '' root
+          do
+            test -f "$root/.buildignore" && continue
+            git diff --quiet HEAD^ HEAD "$root" && continue
+          
+            roots=$(jq -c ". + [\"$root\"]" <<< "$roots")
+          done < <(find . -maxdepth 1 -mindepth 1 -type d -not -path './.*' -print0)
+
+          echo "roots=$roots" >> "$GITHUB_OUTPUT"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: resolve_roots
+    strategy:
+      matrix:
+        root: ${{ fromJson(needs.resolve_roots.outputs.roots) }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          cd ${{ matrix.root }}
+          ./build-cmd
