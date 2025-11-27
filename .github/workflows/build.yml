@@ -27,11 +27,10 @@ jobs:
 
           while IFS= read -r -d '' root
           do
-            test -f "$root/.buildignore" && continue
-            git diff --quiet "$last_run_sha" HEAD "$root" && continue
-          
-            roots=$(jq -c ". + [\"$root\"]" <<< "$roots")
-          done < <(find . -maxdepth 1 -mindepth 1 -type d -not -path './.*' -print0)
+              if ! git diff --quiet "$last_run_sha" HEAD "$root"; then
+                roots=$(jq -c ". + [\"$(basename "$root")\"]" <<< "$roots")
+              fi
+          done < <(find . -maxdepth 1 -mindepth 1 -type d -not -path './.*' ! -exec test -f "{}/.buildignore" \; -print0)
 
           echo "roots=$roots" >> "$GITHUB_OUTPUT"
 
