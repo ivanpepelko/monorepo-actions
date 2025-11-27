@@ -3,6 +3,10 @@ name: Build
 on:
   workflow_dispatch:
   push:
+    paths-ignore:
+      - .github/**
+      - .gitignore
+      - README.md
 
 jobs:
   resolve_roots:
@@ -34,8 +38,10 @@ jobs:
     strategy:
       matrix:
         root: ${{ fromJson(needs.resolve_roots.outputs.roots) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.root }}
     steps:
       - uses: actions/checkout@v2
       - run: |
-          cd ${{ matrix.root }}
           ./build-cmd
