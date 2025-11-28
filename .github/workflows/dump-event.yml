@@ -1,9 +1,0 @@
-name: Dump Event
-
-on: [push]
-
-jobs:
-  dump:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "${{ toJSON(github.event.commits.*.modified) }}"
