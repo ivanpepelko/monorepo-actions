@@ -15,7 +15,7 @@ jobs:
           curl -H "Authorization: token $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/orgs/simmcomm/packages
+            'https://api.github.com/orgs/simmcomm/packages?package_type=container'
 
           gh api --jq '.[] | select(.repository.name == "frontend-apps") | .name' \
             -H "Accept: application/vnd.github+json" \
