@@ -1,0 +1,3 @@
+FROM debian:13-slim
+
+CMD ["echo", "hello world"]
